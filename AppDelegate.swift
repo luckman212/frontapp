@@ -60,6 +60,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             if let mutableString = self.logTextView.textStorage {
                 let attrString = NSAttributedString(string: logmsg, attributes: [.font: NSFont(name: fontName, size: 12)!, .foregroundColor: NSColor.white])
                 mutableString.append(attrString)
+                self.logTextView.scrollRangeToVisible(NSMakeRange(self.logTextView.string.count, 0))
             }
         }
     }
