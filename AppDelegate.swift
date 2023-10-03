@@ -1,5 +1,6 @@
 //
-// frontapp - luckman212
+// frontapp
+// https://github.com/luckman212/frontapp
 //
 // https://developer.apple.com/documentation/appkit/nsworkspace/1535049-didactivateapplicationnotificati
 //
@@ -33,12 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             mainWindow.setFrame(NSRectFromString(frameString), display: true)
         }
         mainWindow.makeKeyAndOrderFront(nil)
-        /*
-            let menu = NSMenu()
-            let toggleWindowMenuItem = NSMenuItem(title: "Toggle Window", action: #selector(toggleWindow), keyEquivalent: "")
-            menu.addItem(toggleWindowMenuItem)
-            statusItem.menu = menu
-        */
         statusItem.button?.action = #selector(toggleWindow)
         self.logToWindowAndConsole("=== logging started ===")
     }
@@ -90,13 +85,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 DispatchQueue.main.async {
                     let logText = "\(appPath) (\(appName)/\(appIdentifier)/\(processIdentifier))"
                     self.logToWindowAndConsole(logText)
-                    /*
-                    print(logText, terminator: "")
-                    if let mutableString = self.logTextView.textStorage {
-                        let attrString = NSAttributedString(string: logText, attributes: [.font: NSFont(name: fontName, size: 12)!])
-                        mutableString.append(attrString)
-                    }
-                    */
                 }
                 if let button = statusItem.button {
                     button.title = "\(appName)"
