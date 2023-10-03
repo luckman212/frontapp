@@ -23,6 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         logTextView.isEditable = false
         logTextView.usesFontPanel = false
         logTextView.font = NSFont(name: fontName, size: 12)
+        logTextView.backgroundColor = NSColor.black
         if let frontmostApp = NSWorkspace.shared.frontmostApplication,
             let appName = frontmostApp.localizedName {
                 if let button = statusItem.button {
