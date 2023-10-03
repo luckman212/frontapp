@@ -9,6 +9,17 @@ import Cocoa
 import AVFoundation
 let fontName = "SFMono-Regular"
 
+class NoWrapTextView: NSTextView {
+    override func draw(_ dirtyRect: NSRect) {
+        self.textContainer?.containerSize = NSMakeSize(CGFloat.greatestFiniteMagnitude, CGFloat.greatestFiniteMagnitude)
+        self.textContainer?.widthTracksTextView = false
+        self.isHorizontallyResizable = true
+        self.textContainer?.lineBreakMode = .byClipping
+        self.font = NSFont(name: fontName, size: 12)
+        super.draw(dirtyRect)
+    }
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
@@ -31,10 +42,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         mainWindow.delegate = self
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(appChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
-        logTextView.isEditable = false
-        logTextView.usesFontPanel = false
-        logTextView.font = NSFont(name: fontName, size: 12)
-        logTextView.backgroundColor = NSColor.black
         if let frontmostApp = NSWorkspace.shared.frontmostApplication,
             let appName = frontmostApp.localizedName {
                 if let button = statusItem.button {
@@ -46,9 +53,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             mainWindow.setFrame(NSRectFromString(frameString), display: true)
         }
         if let soundPref = UserDefaults.standard.value(forKey: "shouldPlaySounds") as? Bool {
-           shouldPlaySounds = soundPref
+            shouldPlaySounds = soundPref
         }
         mainWindow.makeKeyAndOrderFront(nil)
+        logTextView.isEditable = false
+        logTextView.usesFontPanel = false
+        logTextView.font = NSFont(name: fontName, size: 12)
+        logTextView.backgroundColor = NSColor.black
+        //logTextView.textContainer?.lineBreakMode = .byClipping
         statusItem.button?.action = #selector(toggleWindow)
         if let soundPref = UserDefaults.standard.value(forKey: "shouldPlaySounds") as? Bool {
             shouldPlaySounds = soundPref
