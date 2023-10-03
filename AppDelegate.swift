@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import AVFoundation
 let fontName = "SFMono-Regular"
 
 @NSApplicationMain
@@ -13,9 +14,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var logTextView: NSTextView!
+    @IBOutlet weak var playSoundsMenuItem: NSMenuItem!
     
     var lastActiveAppName: String?
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    var changeSound: AVAudioPlayer?
+    var shouldPlaySounds = false
+
+    @IBAction func toggleSoundPlayback(_ sender: NSMenuItem) {
+        shouldPlaySounds.toggle()
+        UserDefaults.standard.set(shouldPlaySounds, forKey: "shouldPlaySounds")
+        playSoundsMenuItem?.state = shouldPlaySounds ? .on : .off
+        self.logToWindowAndConsole("=== play sound: \(shouldPlaySounds) ===")
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         mainWindow.delegate = self
@@ -34,8 +45,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if let frameString = UserDefaults.standard.string(forKey: "windowFrame") {
             mainWindow.setFrame(NSRectFromString(frameString), display: true)
         }
+        if let soundPref = UserDefaults.standard.value(forKey: "shouldPlaySounds") as? Bool {
+           shouldPlaySounds = soundPref
+        }
         mainWindow.makeKeyAndOrderFront(nil)
         statusItem.button?.action = #selector(toggleWindow)
+        if let soundPref = UserDefaults.standard.value(forKey: "shouldPlaySounds") as? Bool {
+            shouldPlaySounds = soundPref
+            playSoundsMenuItem.state = shouldPlaySounds ? .on : .off
+        }
         self.logToWindowAndConsole("=== logging started ===")
     }
     
@@ -65,6 +83,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
+    func playSound() {
+        if let soundURL = Bundle.main.url(forResource: "EmptySpace", withExtension: "aiff") {
+            changeSound = try? AVAudioPlayer(contentsOf: soundURL)
+            changeSound?.play()
+        }
+    }
+    
     @objc func toggleWindow() {
         if mainWindow.isVisible {
             mainWindow.orderOut(nil)
@@ -87,6 +112,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 DispatchQueue.main.async {
                     let logText = "\(appPath) (\(appName)/\(appIdentifier)/\(processIdentifier))"
                     self.logToWindowAndConsole(logText)
+                    if self.shouldPlaySounds {
+                        self.playSound()
+                    }
                 }
                 if let button = statusItem.button {
                     button.title = "\(appName)"
