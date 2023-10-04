@@ -71,11 +71,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         mainWindow.delegate = self
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(appChanged), name: NSWorkspace.didActivateApplicationNotification, object: nil)
         if let frontmostApp = NSWorkspace.shared.frontmostApplication,
-            let appName = frontmostApp.localizedName {
-                if let button = statusItem.button {
-                    button.title = "\(appName)"
-                }
-            }
+           let appName = frontmostApp.localizedName {
+            updateMenuBarText(appName)
+        }
         mainWindow.orderOut(nil)
         if let frameString = UserDefaults.standard.string(forKey: "windowFrame") {
             mainWindow.setFrame(NSRectFromString(frameString), display: true)
@@ -99,10 +97,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         UserDefaults.standard.set(frameString, forKey: "windowFrame")
     }
 
+    func updateMenuBarText(_ appName: String) {
+        if let button = statusItem.button {
+            button.title = "✨\(appName)✨"
+        }
+    }
+    
     func logToWindowAndConsole(_ message: String) {
         let currentTime = dateFormatter.string(from: Date())
         let logmsg = "\(currentTime)  \(message)\n"
         print(logmsg, terminator: "")
+        
         DispatchQueue.main.async {
             if let mutableString = self.logTextView.textStorage {
                 let attrString = NSAttributedString(string: logmsg, attributes: self.logTextAttributes)
@@ -141,12 +146,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 DispatchQueue.main.async {
                     let logText = "\(appPath) (\(appName)/\(appIdentifier)/\(processIdentifier))"
                     self.logToWindowAndConsole(logText)
+                    self.updateMenuBarText(appName)
                     if self.shouldPlaySounds {
                         self.playSound()
                     }
-                }
-                if let button = statusItem.button {
-                    button.title = "\(appName)"
                 }
             }
         }

@@ -12,10 +12,14 @@ The following details are logged to the window:
 - Bundle ID
 - PID
 
-Click the menubar item to toggle (hide/show) the window.
+Click the menubar item to toggle (hide/show) the window. The window can also be resized and will remember its size and position.
 
 There is a small (optional) beep sound that will play when an app change is detected. You can toggle this via the *frontapp* menu at the top left.
 
-## screenshot
+## screenshots
 
+#### menubar item
+![](./menubar.png)
+
+#### log window
 ![](./logwindow.png)
