@@ -19,7 +19,9 @@ There is a small (optional) beep sound that will play when an app change is dete
 ## screenshots
 
 #### menubar item
-![](./menubar.png)
+
+<img src=./menubar.png width=386>
 
 #### log window
+
 ![](./logwindow.png)
