@@ -10,12 +10,29 @@ import AVFoundation
 let fontName = "SFMono-Regular"
 
 class NoWrapTextView: NSTextView {
-    override func draw(_ dirtyRect: NSRect) {
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupView()
+    }
+    
+    func setupView() {
+        self.isEditable = false
+        self.usesFontPanel = false
+        self.font = NSFont(name: fontName, size: 12)
+        self.backgroundColor = NSColor.black
+        self.textContainer?.lineBreakMode = .byClipping
         self.textContainer?.containerSize = NSMakeSize(CGFloat.greatestFiniteMagnitude, CGFloat.greatestFiniteMagnitude)
         self.textContainer?.widthTracksTextView = false
         self.isHorizontallyResizable = true
-        self.textContainer?.lineBreakMode = .byClipping
-        self.font = NSFont(name: fontName, size: 12)
+    }
+    
+    override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
 }
@@ -26,6 +43,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var logTextView: NSTextView!
     @IBOutlet weak var playSoundsMenuItem: NSMenuItem!
+    
+    let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+        return formatter
+    }()
+    
+    let logTextAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont(name: fontName, size: 12)!,
+        .foregroundColor: NSColor.white
+    ]
     
     var lastActiveAppName: String?
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -54,18 +82,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         if let soundPref = UserDefaults.standard.value(forKey: "shouldPlaySounds") as? Bool {
             shouldPlaySounds = soundPref
-        }
-        mainWindow.makeKeyAndOrderFront(nil)
-        logTextView.isEditable = false
-        logTextView.usesFontPanel = false
-        logTextView.font = NSFont(name: fontName, size: 12)
-        logTextView.backgroundColor = NSColor.black
-        //logTextView.textContainer?.lineBreakMode = .byClipping
-        statusItem.button?.action = #selector(toggleWindow)
-        if let soundPref = UserDefaults.standard.value(forKey: "shouldPlaySounds") as? Bool {
-            shouldPlaySounds = soundPref
             playSoundsMenuItem.state = shouldPlaySounds ? .on : .off
         }
+        mainWindow.makeKeyAndOrderFront(nil)
+        statusItem.button?.action = #selector(toggleWindow)
         self.logToWindowAndConsole("=== logging started ===")
     }
     
@@ -80,15 +100,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func logToWindowAndConsole(_ message: String) {
-        //let currentTime = DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .medium)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let currentTime = formatter.string(from: Date())
+        let currentTime = dateFormatter.string(from: Date())
         let logmsg = "\(currentTime)  \(message)\n"
         print(logmsg, terminator: "")
         DispatchQueue.main.async {
             if let mutableString = self.logTextView.textStorage {
-                let attrString = NSAttributedString(string: logmsg, attributes: [.font: NSFont(name: fontName, size: 12)!, .foregroundColor: NSColor.white])
+                let attrString = NSAttributedString(string: logmsg, attributes: self.logTextAttributes)
                 mutableString.append(attrString)
                 self.logTextView.scrollRangeToVisible(NSMakeRange(self.logTextView.string.count, 0))
             }
