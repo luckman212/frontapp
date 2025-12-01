@@ -49,9 +49,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
         return formatter
     }()
-    
+
     let logTextAttributes: [NSAttributedString.Key: Any] = [
-        .font: NSFont(name: fontName, size: 12)!,
+        .font: NSFont(name: fontName, size: 12) ?? NSFont.monospacedSystemFont(ofSize: 12, weight: .regular),
         .foregroundColor: NSColor.white
     ]
     
