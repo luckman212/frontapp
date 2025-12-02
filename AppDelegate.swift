@@ -24,7 +24,7 @@ class NoWrapTextView: NSTextView {
     func setupView() {
         self.isEditable = false
         self.usesFontPanel = false
-        self.font = NSFont(name: fontName, size: 12)
+        self.font = NSFont(name: fontName, size: 12) ?? NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
         self.backgroundColor = NSColor.black
         self.textContainer?.lineBreakMode = .byClipping
         self.textContainer?.containerSize = NSMakeSize(CGFloat.greatestFiniteMagnitude, CGFloat.greatestFiniteMagnitude)
